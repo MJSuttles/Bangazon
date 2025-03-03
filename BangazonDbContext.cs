@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Bangazon.Models;
+using Microsoft.EntityFrameworkCore; // ✅ Required for UseSqlite()
+
 
 public class BangazonDbContext : DbContext
 {
