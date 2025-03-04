@@ -2,6 +2,7 @@ using Bangazon.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Http.Json;
+using Microsoft.EntityFrameworkCore.Query;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,7 +50,19 @@ app.UseHttpsRedirection();
 
 // ORDER Calls
 
+app.MapGet("/api/orders/{id}", (BangazonDbContext db, string id) =>
+{
+    Order order = db.Orders
+        .Where(o => o.CustomerId == id)
+        .Include(o => o.OrderItems)
+        .FirstOrDefault();
 
+    if (order == null)
+    {
+        return Results.NotFound();
+    }
+    return Results.Ok(order);
+});
 
 // ORDERITEM Calls
 
