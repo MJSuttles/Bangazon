@@ -7,6 +7,7 @@ public class Order
 {
   public int Id { get; set; }
   public string CustomerId { get; set; }
-  public bool IsComplete { get; set; }
-  public int CartId { get; set; }
+  public bool IsAvailable { get; set; }
+  public int UserPaymentMethod { get; set; }
+  public List<OrderItem> OrderItems { get; set; }
 }
