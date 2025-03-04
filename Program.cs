@@ -35,4 +35,44 @@ app.UseHttpsRedirection();
 
 // API Calls
 
+// CART Calls
+
+
+
+// CARTITEMS Calls
+
+
+
+// CATEGORY Calls
+
+
+
+// ORDER Calls
+
+
+
+// ORDERITEM Calls
+
+
+
+// PAYMENTOPTION Calls
+
+
+
+// PRODUCT Calls
+
+app.MapGet("/api/products", (BangazonDbContext db) =>
+{
+    return db.Products.ToList();
+});
+
+// USER Calls
+
+
+
+// USERPAYMENTMETHOD Calls
+
+
+
+
 app.Run();
