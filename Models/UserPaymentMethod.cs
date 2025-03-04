@@ -1,14 +1,20 @@
 using System.ComponentModel.DataAnnotations;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Bangazon.Models;
 
 public class UserPaymentMethod
 {
   public int Id { get; set; }
-  public string UserId { get; set; }
+
+  [Required]
+  public string UserId { get; set; }  // ✅ Must match User.Uid
+
+  [ForeignKey("UserId")]
+  public User User { get; set; }  // ✅ Correct reference to User
+
   public int PaymentOptionId { get; set; }
-  public List<Order> Orders { get; set; }
-  public Cart Cart { get; set; }
+
+  [ForeignKey("PaymentOptionId")]
   public PaymentOption PaymentOption { get; set; }
 }

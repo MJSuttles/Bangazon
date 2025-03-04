@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Bangazon.Models;
 
@@ -9,6 +9,10 @@ public class OrderItem
   public int OrderId { get; set; }
   public int ProductId { get; set; }
   public int Quantity { get; set; }
-  public string SellerId { get; set; }
-  public List<Product> Products { get; set; }
+
+  [ForeignKey("OrderId")]
+  public Order Order { get; set; }  // ✅ Reference to Order
+
+  [ForeignKey("ProductId")]
+  public Product Product { get; set; }  // ✅ Reference to Product
 }
