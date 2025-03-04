@@ -1,11 +1,14 @@
 using System.ComponentModel.DataAnnotations;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.Collections.Generic;
 
 namespace Bangazon.Models;
 
 public class PaymentOption
 {
   public int Id { get; set; }
-  public string Type { get; set; }
-  public UserPaymentMethod UserPaymentMethod { get; set; }
+
+  [Required]
+  public string Type { get; set; }  // ✅ Payment type (e.g., "Credit Card", "PayPal")
+
+  public List<UserPaymentMethod> UserPaymentMethods { get; set; } = new List<UserPaymentMethod>();
 }
