@@ -9,6 +9,7 @@ public class OrderItem
   public int OrderId { get; set; }
   public int ProductId { get; set; }
   public int Quantity { get; set; }
+  public string SellerId { get; set; }
 
   [ForeignKey("OrderId")]
   public Order Order { get; set; }  // ✅ Reference to Order

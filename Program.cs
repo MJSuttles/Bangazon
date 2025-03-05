@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore.Query;
+using Npgsql.Internal;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -97,6 +98,45 @@ app.MapPost("/api/cart/add-payment", (BangazonDbContext db, string userId, int p
 
     cart.UserPaymentMethodId = paymentMethodId;
     db.SaveChanges();
+
+    return Results.Ok(cart);
+});
+
+// Complete Order (Moves Items to Order and Clears the Cart)
+
+app.MapPost("/api/orders/complete", (BangazonDbContext db, string userId) =>
+{
+    Cart cart = db.Carts.Include(c => c.CartItems).FirstOrDefault(c => c.UserId == userId);
+
+    if (cart == null || !cart.CartItems.Any())
+    {
+        return Results.BadRequest("Cart is empty");
+    }
+
+    Order order = new Order
+    {
+        CustomerId = userId,
+        UserPaymentMethodId = cart.UserPaymentMethodId,
+        IsAvailable = true
+    };
+
+    db.Orders.Add(order);
+    db.SaveChanges();
+
+    List<OrderItem> orderItems = cart.CartItems.Select(ci => new OrderItem
+    {
+        OrderId = order.Id,
+        ProductId = ci.ProductId,
+        Quantity = ci.Quantity,
+        SellerId = db.Products.FirstOrDefault(p => p.Id == ci.ProductId)?.SellerId ?? ""
+    }).ToList();
+
+    db.OrderItems.AddRange(orderItems);
+    db.CartItems.RemoveRange(cart.CartItems); // Clears cart Items
+    db.Carts.Remove(cart); // Removes cart after checkout
+    db.SaveChanges();
+
+    return Results.Ok(order);
 });
 
 // CARTITEMS Calls
