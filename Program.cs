@@ -50,6 +50,8 @@ app.UseHttpsRedirection();
 
 // ORDER Calls
 
+// GET Orders by Customer
+
 app.MapGet("/api/orders/{id}", (BangazonDbContext db, string id) =>
 {
     Order order = db.Orders
@@ -74,6 +76,8 @@ app.MapGet("/api/orders/{id}", (BangazonDbContext db, string id) =>
 
 // PRODUCT Calls
 
+// GET All Products
+
 app.MapGet("/api/products", (BangazonDbContext db) =>
 {
     return db.Products.ToList();
@@ -81,7 +85,14 @@ app.MapGet("/api/products", (BangazonDbContext db) =>
 
 // USER Calls
 
+// Add User
 
+app.MapPost("/api/register", (BangazonDbContext db, User user) =>
+{
+    db.Users.Add(user);
+    db.SaveChanges();
+    return Results.Created($"/users/{user.Uid}", user);
+});
 
 // USERPAYMENTMETHOD Calls
 
