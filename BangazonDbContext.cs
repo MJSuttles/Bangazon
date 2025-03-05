@@ -12,7 +12,7 @@ public class BangazonDbContext : DbContext
   public DbSet<CartItem> CartItems { get; set; }
   public DbSet<Cart> Carts { get; set; }
   public DbSet<Order> Orders { get; set; }
-  public DbSet<OrderItem> OrdersItems { get; set; }
+  public DbSet<OrderItem> OrderItems { get; set; }
 
   public BangazonDbContext(DbContextOptions<BangazonDbContext> context) : base(context)
   {
