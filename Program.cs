@@ -38,7 +38,34 @@ app.UseHttpsRedirection();
 
 // CART Calls
 
+// Add to Cart
 
+app.MapPost("/api/cart/add", (BangazonDbContext db, string userId, int productId, int quantity) =>
+{
+    var cart = db.Carts.FirstOrDefault(c => c.UserId == userId);
+
+    if (cart == null)
+    {
+        cart = new Cart { UserId = userId };
+        db.Carts.Add(cart);
+        db.SaveChanges();
+    }
+
+    var cartItem = db.CartItems.FirstOrDefault(ci => ci.CartId == cart.Id && ci.ProductId == productId);
+
+    if (cartItem == null)
+    {
+        cartItem = new CartItem { CartId = cart.Id, ProductId = productId, Quantity = quantity };
+        db.CartItems.Add(cartItem);
+    }
+    else
+    {
+        cartItem.Quantity += quantity;
+    }
+
+    db.SaveChanges();
+    return Results.Ok(cart);
+});
 
 // CARTITEMS Calls
 
