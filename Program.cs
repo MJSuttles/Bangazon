@@ -84,6 +84,21 @@ app.MapPost("/api/cart/add", (BangazonDbContext db, string userId, int productId
     return Results.Ok(cart);
 });
 
+// Add Payment Method to Cart
+
+app.MapPost("/api/cart/add-payment", (BangazonDbContext db, string userId, int paymentMethodId) =>
+{
+    Cart cart = db.Carts.FirstOrDefault(c => c.UserId == userId);
+
+    if (cart == null)
+    {
+        return Results.NotFound();
+    }
+
+    cart.UserPaymentMethodId = paymentMethodId;
+    db.SaveChanges();
+});
+
 // CARTITEMS Calls
 
 
