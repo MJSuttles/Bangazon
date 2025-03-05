@@ -38,6 +38,23 @@ app.UseHttpsRedirection();
 
 // CART Calls
 
+// GET Customer Cart
+
+app.MapGet("/api/cart/{userId}", (BangazonDbContext db, string userId) =>
+{
+    Cart cart = db.Carts
+        .Include(c => c.CartItems)
+        .ThenInclude(ci => ci.Product)
+        .FirstOrDefault(c => c.UserId == userId);
+
+    if (cart == null)
+    {
+        return Results.NotFound();
+    }
+
+    return Results.Ok(cart);
+});
+
 // Add to Cart
 
 app.MapPost("/api/cart/add", (BangazonDbContext db, string userId, int productId, int quantity) =>
