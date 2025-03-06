@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore.Query;
 using Npgsql.Internal;
+using System.Security.Cryptography;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,12 +28,12 @@ builder.Services.Configure<JsonOptions>(options =>
 // Configure CORS policy to allow frontend requests
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowReactApp",
-        policy =>
+    options.AddDefaultPolicy(policy =>
         {
             policy.WithOrigins("http://localhost:3000")
                 .AllowAnyMethod()
-                .AllowAnyHeader();
+                .AllowAnyHeader()
+                .AllowCredentials();
         });
 });
 
@@ -46,7 +47,7 @@ if (app.Environment.IsDevelopment())
 }
 
 // Apply CORS before routing
-app.UseCors("AllowReactApp");
+app.UseCors();
 
 app.UseHttpsRedirection();
 
@@ -117,7 +118,33 @@ app.MapPost("/api/cart/add-payment", (BangazonDbContext db, string userId, int p
     return Results.Ok(cart);
 });
 
-// Complete Order (Moves Items to Order and Clears the Cart)
+// CARTITEMS Calls
+
+
+
+// CATEGORY Calls
+
+
+
+// ORDER Calls
+
+app.MapGet("/api/orders/sellers/{sellerId}", (BangazonDbContext db, string sellerId) =>
+{
+    List<Order> orders = db.Orders
+        .Where(o => o.IsComplete == true && o.OrderItems.Any(oi => oi.SellerId == sellerId))
+        .Include(o => o.OrderItems)
+        .ThenInclude(oi => oi.Product)
+        .ToList();
+
+    if (!orders.Any())
+    {
+        return Results.NotFound();
+    }
+
+    return Results.Ok(orders);
+});
+
+// POST Order and then Complete Order (Moves Items to Order and Clears the Cart)
 
 app.MapPost("/api/orders/complete", (BangazonDbContext db, string userId) =>
 {
@@ -128,11 +155,12 @@ app.MapPost("/api/orders/complete", (BangazonDbContext db, string userId) =>
         return Results.BadRequest("Cart is empty");
     }
 
+    // ✅ Order starts with isComplete = false
     Order order = new Order
     {
         CustomerId = userId,
         UserPaymentMethodId = cart.UserPaymentMethodId,
-        IsAvailable = true
+        IsComplete = false // ✅ Order is not complete until payment is confirmed
     };
 
     db.Orders.Add(order);
@@ -147,22 +175,29 @@ app.MapPost("/api/orders/complete", (BangazonDbContext db, string userId) =>
     }).ToList();
 
     db.OrderItems.AddRange(orderItems);
-    db.CartItems.RemoveRange(cart.CartItems); // Clears cart Items
+    db.CartItems.RemoveRange(cart.CartItems); // Clears cart items
     db.Carts.Remove(cart); // Removes cart after checkout
     db.SaveChanges();
 
     return Results.Ok(order);
 });
 
-// CARTITEMS Calls
+// ✅ Separate API call to mark order as complete when payment is provided
+app.MapPost("/api/orders/confirm-payment/{orderId}", (BangazonDbContext db, int orderId) =>
+{
+    Order order = db.Orders.FirstOrDefault(o => o.Id == orderId);
 
+    if (order == null)
+    {
+        return Results.NotFound("Order not found.");
+    }
 
+    // ✅ Change isComplete to true once payment is confirmed
+    order.IsComplete = true;
+    db.SaveChanges();
 
-// CATEGORY Calls
-
-
-
-// ORDER Calls
+    return Results.Ok(order);
+});
 
 // GET Orders by Customer
 
@@ -200,6 +235,18 @@ app.MapGet("/api/products", (BangazonDbContext db) =>
 // USER Calls
 
 // Add User
+
+app.MapGet("/api/checkuser/{userId}", (BangazonDbContext db, string userId) =>
+{
+    var user = db.Users.FirstOrDefault(u => u.Uid == userId);
+
+    if (user == null)
+    {
+        return Results.NotFound();
+    }
+
+    return Results.Ok(user);
+});
 
 app.MapPost("/api/register", (BangazonDbContext db, User user) =>
 {
