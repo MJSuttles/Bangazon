@@ -205,16 +205,50 @@ app.MapPost("/api/orders/confirm-payment/{orderId}", (BangazonDbContext db, int 
 
 app.MapGet("/api/orders/{id}", (BangazonDbContext db, string id) =>
 {
-    Order order = db.Orders
+    var order = db.Orders
         .Where(o => o.CustomerId == id)
         .Include(o => o.OrderItems)
+        .ThenInclude(oi => oi.Product) // ✅ Include Product for SellerId reference
         .FirstOrDefault();
 
     if (order == null)
     {
         return Results.NotFound();
     }
-    return Results.Ok(order);
+
+    // Fetch Seller details using the SellerId from the Product table
+    var orderDetails = new
+    {
+        order.Id,
+        order.CustomerId,
+        order.UserPaymentMethodId,
+        order.IsComplete,
+        OrderItems = order.OrderItems.Select(oi => new
+        {
+            oi.ProductId,
+            oi.Quantity,
+            ProductName = oi.Product.Name,
+            Category = oi.Product.Category.Title,
+            Price = oi.Product.Price,
+            Image = oi.Product.Image,
+            Seller = db.Users
+                .Where(u => u.Uid == oi.Product.SellerId)
+                .Select(s => new
+                {
+                    s.Uid,
+                    s.FirstName,
+                    s.LastName,
+                    s.Email,
+                    s.Address,
+                    s.City,
+                    s.State,
+                    s.Zip
+                })
+                .FirstOrDefault() // ✅ Get seller details for each product
+        }).ToList() // ✅ Make sure to convert to a list
+    };
+
+    return Results.Ok(orderDetails);
 });
 
 // ORDERITEM Calls
@@ -335,7 +369,6 @@ app.MapGet("/api/sellers/search", (BangazonDbContext db, string searchTerm) =>
 
     return Results.Ok(sellers);
 });
-
 
 
 app.Run();
