@@ -250,23 +250,6 @@ app.MapGet("/api/products", (BangazonDbContext db) =>
     return db.Products.ToList();
 });
 
-// GET Search by Product Name
-
-app.MapGet("/api/products/search", (BangazonDbContext db, string searchTerm) =>
-{
-    var products = db.Products
-        .Where(p => p.Name.ToLower().Contains(searchTerm.ToLower())) // ✅ Case-insensitive search
-        .Include(p => p.Category) // ✅ Include Category data
-        .ToList();
-
-    if (!products.Any())
-    {
-        return Results.NotFound("No products found.");
-    }
-
-    return Results.Ok(products);
-});
-
 // USER Calls
 
 // Add User
@@ -292,6 +275,66 @@ app.MapPost("/api/register", (BangazonDbContext db, User user) =>
 
 // USERPAYMENTMETHOD Calls
 
+
+
+// SEARCH Calls
+
+// GET Search by Product Name
+
+app.MapGet("/api/products/search", (BangazonDbContext db, string searchTerm) =>
+{
+    var products = db.Products
+        .Where(p => p.Name.ToLower().Contains(searchTerm.ToLower())) // ✅ Case-insensitive search
+        .Include(p => p.Category) // ✅ Include Category data
+        .ToList();
+
+    if (!products.Any())
+    {
+        return Results.NotFound("No products found.");
+    }
+
+    return Results.Ok(products);
+});
+
+// GET Search by Seller Name
+
+app.MapGet("/api/sellers/search", (BangazonDbContext db, string searchTerm) =>
+{
+    var sellerUids = db.Users
+        .Where(u => u.FirstName.ToLower().Contains(searchTerm.ToLower())
+                 || u.LastName.ToLower().Contains(searchTerm.ToLower()))
+        .Select(u => u.Uid)
+        .ToList();
+
+    if (!sellerUids.Any())
+    {
+        return Results.NotFound("No sellers found.");
+    }
+
+    var sellersWithProducts = db.Products
+        .Where(p => sellerUids.Contains(p.SellerId)) // ✅ Ensure seller has products
+        .Select(p => p.SellerId)
+        .Distinct()
+        .ToList();
+
+    var sellers = db.Users
+        .Where(u => sellersWithProducts.Contains(u.Uid)) // ✅ Filter only sellers with products
+        .Select(u => new
+        {
+            u.Uid,
+            u.FirstName,
+            u.LastName,
+            u.Email
+        })
+        .ToList();
+
+    if (!sellers.Any())
+    {
+        return Results.NotFound("No matching sellers with products found.");
+    }
+
+    return Results.Ok(sellers);
+});
 
 
 
