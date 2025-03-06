@@ -250,6 +250,23 @@ app.MapGet("/api/products", (BangazonDbContext db) =>
     return db.Products.ToList();
 });
 
+// GET Search by Product Name
+
+app.MapGet("/api/products/search", (BangazonDbContext db, string searchTerm) =>
+{
+    var products = db.Products
+        .Where(p => p.Name.ToLower().Contains(searchTerm.ToLower())) // ✅ Case-insensitive search
+        .Include(p => p.Category) // ✅ Include Category data
+        .ToList();
+
+    if (!products.Any())
+    {
+        return Results.NotFound("No products found.");
+    }
+
+    return Results.Ok(products);
+});
+
 // USER Calls
 
 // Add User
