@@ -128,6 +128,8 @@ app.MapPost("/api/cart/add-payment", (BangazonDbContext db, string userId, int p
 
 // ORDER Calls
 
+// GET Orders by Seller
+
 app.MapGet("/api/orders/sellers/{sellerId}", (BangazonDbContext db, string sellerId) =>
 {
     List<Order> orders = db.Orders
@@ -144,7 +146,7 @@ app.MapGet("/api/orders/sellers/{sellerId}", (BangazonDbContext db, string selle
     return Results.Ok(orders);
 });
 
-// POST Order and then Complete Order (Moves Items to Order and Clears the Cart)
+// POST then Complete Order (Moves Items to Order and Clears the Cart)
 
 app.MapPost("/api/orders/complete", (BangazonDbContext db, string userId) =>
 {
@@ -224,6 +226,22 @@ app.MapGet("/api/orders/{id}", (BangazonDbContext db, string id) =>
 
 
 // PRODUCT Calls
+
+// GET Products by Id
+
+app.MapGet("/api/products/{id}", (BangazonDbContext db, int id) =>
+{
+    Product product = db.Products
+        .Include(p => p.Category)
+        .FirstOrDefault(p => p.Id == id);
+
+    if (product == null)
+    {
+        return Results.NotFound();
+    }
+
+    return Results.Ok(product);
+});
 
 // GET All Products
 

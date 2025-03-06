@@ -17,4 +17,5 @@ public class Product
   public string SellerId { get; set; }
   public List<OrderItem> OrderItems { get; set; }
   public CartItem CartItem { get; set; }
+  public Category Category { get; set; }
 }
