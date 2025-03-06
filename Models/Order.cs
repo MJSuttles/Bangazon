@@ -14,7 +14,7 @@ public class Order
   [ForeignKey("CustomerId")]
   public User User { get; set; }  // ✅ Correct reference to User
 
-  public bool IsAvailable { get; set; }
+  public bool IsComplete { get; set; }
   public int UserPaymentMethodId { get; set; }
 
   [ForeignKey("UserPaymentMethodId")]
