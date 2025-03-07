@@ -317,6 +317,19 @@ app.MapGet("/api/products/seller/{sellerId}", (BangazonDbContext db, string sell
     return Results.Ok(products);
 });
 
+// GET 20 Latest Products
+
+app.MapGet("/api/products/latest", (BangazonDbContext db) =>
+{
+    List<Product> latestProducts = db.Products
+        .OrderByDescending(p => p.Id)
+        .Take(20)
+        .Include(p => p.Category)
+        .ToList();
+
+    return Results.Ok(latestProducts);
+});
+
 
 // USER Calls
 
