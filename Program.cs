@@ -118,6 +118,34 @@ app.MapPost("/api/cart/add-payment", (BangazonDbContext db, string userId, int p
     return Results.Ok(cart);
 });
 
+// DELETE Item from Cart
+app.MapDelete("/api/cart/delete-item", (BangazonDbContext db, int cartId, int cartItemId, int productId) =>
+{
+    // Fetch the cart along with its items
+    Cart? cart = db.Carts
+       .Include(c => c.CartItems)
+       .ThenInclude(ci => ci.Product) // Assuming a navigation property exists
+       .SingleOrDefault(c => c.Id == cartId);
+
+    if (cart == null)
+    {
+        return Results.NotFound("Cart not found.");
+    }
+
+    // Find the specific cart item to delete
+    CartItem? cartItemToDelete = cart.CartItems.SingleOrDefault(ci => ci.Id == cartItemId && ci.ProductId == productId);
+
+    if (cartItemToDelete == null)
+    {
+        return Results.NotFound("Cart item not found.");
+    }
+
+    db.CartItems.Remove(cartItemToDelete);
+    db.SaveChanges();
+
+    return Results.NoContent(); // ✅ HTTP 204 - Successfully deleted
+});
+
 // CARTITEMS Calls
 
 
