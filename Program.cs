@@ -125,7 +125,6 @@ app.MapPost("/api/cart/add-payment", (BangazonDbContext db, string userId, int p
 // CATEGORY Calls
 
 
-
 // ORDER Calls
 
 // GET Orders by Seller
@@ -205,7 +204,7 @@ app.MapPost("/api/orders/confirm-payment/{orderId}", (BangazonDbContext db, int 
 
 app.MapGet("/api/orders/{id}", (BangazonDbContext db, string id) =>
 {
-    var order = db.Orders
+    Order? order = db.Orders
         .Where(o => o.CustomerId == id)
         .Include(o => o.OrderItems)
         .ThenInclude(oi => oi.Product) // ✅ Include Product for SellerId reference
@@ -283,6 +282,25 @@ app.MapGet("/api/products", (BangazonDbContext db) =>
 {
     return db.Products.ToList();
 });
+
+// GET Products by Category
+
+app.MapGet("/api/products/category/{categoryId}", (BangazonDbContext db, int categoryId) =>
+{
+    List<Product> products = db.Products
+        .Where(p => p.CategoryId == categoryId) // filters products by CategoryId
+        .Include(p => p.Category) // includes category details
+        .ToList();
+
+    if (!products.Any())
+    {
+        return Results.NotFound($"No products found in the {categoryId} category.");
+    }
+
+    return Results.Ok(products);
+});
+
+
 
 // USER Calls
 
