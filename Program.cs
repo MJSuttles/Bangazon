@@ -354,6 +354,21 @@ app.MapPost("/api/register", (BangazonDbContext db, User user) =>
     return Results.Created($"/users/{user.Uid}", user);
 });
 
+// GET User Details
+
+app.MapGet("/api/users/userdetails/{uid}", (BangazonDbContext db, string uid) =>
+{
+    User user = db.Users
+        .FirstOrDefault(u => u.Uid == uid);
+
+    if (user == null)
+    {
+        return Results.NotFound();
+    }
+
+    return Results.Ok(user);
+});
+
 // USERPAYMENTMETHOD Calls
 
 
