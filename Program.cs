@@ -30,7 +30,7 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
         {
-            policy.WithOrigins("http://localhost:3000")
+            policy.WithOrigins("http://localhost:3001")
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .AllowCredentials();
@@ -300,6 +300,22 @@ app.MapGet("/api/products/category/{categoryId}", (BangazonDbContext db, int cat
     return Results.Ok(products);
 });
 
+// GET Products by Seller
+
+app.MapGet("/api/products/seller/{sellerId}", (BangazonDbContext db, string sellerId) =>
+{
+    List<Product> products = db.Products
+        .Where(p => p.SellerId == sellerId)
+        .Include(p => p.Category)
+        .ToList();
+
+    if (!products.Any())
+    {
+        return Results.NotFound("You have no products available to sell.");
+    }
+
+    return Results.Ok(products);
+});
 
 
 // USER Calls
