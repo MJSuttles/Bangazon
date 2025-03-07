@@ -397,6 +397,53 @@ app.MapGet("/api/users/userdetails/{uid}", (BangazonDbContext db, string uid) =>
     return Results.Ok(user);
 });
 
+// GET Seller Dashboard
+
+app.MapGet("/api/seller/dashboard/{sellerId}", (BangazonDbContext db, string sellerId) =>
+{
+    // Total Sales
+    decimal totalSales = db.OrderItems
+        .Where(oi => oi.SellerId == sellerId && oi.Order.IsComplete)
+        .Sum(oi => oi.Quantity * oi.Product.Price);
+
+    // Total Sales This Month
+    decimal totalSalesThisMonth = db.OrderItems
+        .Where(oi => oi.SellerId == sellerId && oi.Order.IsComplete && oi.Order.OrderDate.Month == DateTime.Now.Month)
+        .Sum(oi => oi.Quantity * oi.Product.Product);
+
+    // Average Sales per Item
+    decimal averageSalesPerItem = db.OrderItems
+        .Where(oi => oi.SellerId == sellerId && oi.Order.IsComplete)
+        .GroupBy(oi => oi.ProductId)
+        .Select(g = global.Sum(oi => oi.Quantity * oi.Product.Price))
+        .DefaultIfEmpty(0)
+        .Average();
+
+    // Total Inventory by Category
+    var inventoryByCategory = db.Products
+        .Where(p => p.SellerId == sellerId)
+        .GroupBy(p => p.Category.Title)
+        .Select(g => new
+        {
+            Category = g.Key,
+            TotalStock = g.Sum(p => p.Quantity)
+        })
+        .ToList();
+
+    // Build and return the dashboard data
+    var dashboardData = new
+    {
+        TotalSales = totalSalesThisMonth,
+        TotalSalesThisMonth = totalSalesThisMonth,
+        AverageSalesPerItem = averageSalesPerItem,
+        InventoryByCategory = inventoryByCategory
+    };
+
+    return Results.Ok(dashboardData);
+});
+
+
+
 // USERPAYMENTMETHOD Calls
 
 
