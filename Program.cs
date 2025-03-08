@@ -371,7 +371,12 @@ app.MapGet("/api/checkuser/{userId}", (BangazonDbContext db, string userId) =>
 
     if (user == null)
     {
-        return Results.NotFound();
+        return Results.Json(new
+        {
+            status = "not_found",
+            message = "User not found. Redirecting to registration.",
+            redirect = "/register"
+        }, statusCode: 404);
     }
 
     return Results.Ok(user);
