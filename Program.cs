@@ -30,7 +30,7 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
         {
-            policy.WithOrigins("http://localhost:3001")
+            policy.WithOrigins("http://localhost:3000")
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .AllowCredentials();
@@ -184,12 +184,13 @@ app.MapPost("/api/orders/complete", (BangazonDbContext db, string userId) =>
         return Results.BadRequest("Cart is empty");
     }
 
-    // ✅ Order starts with isComplete = false
+    // ✅ Order starts with isComplete = false and sets OrderDate
     Order order = new Order
     {
         CustomerId = userId,
         UserPaymentMethodId = cart.UserPaymentMethodId,
-        IsComplete = false // ✅ Order is not complete until payment is confirmed
+        IsComplete = false, // ✅ Order is not complete until payment is confirmed
+        OrderDate = DateTime.UtcNow // ✅ Add OrderDate when order is created
     };
 
     db.Orders.Add(order);
@@ -243,13 +244,14 @@ app.MapGet("/api/orders/{id}", (BangazonDbContext db, string id) =>
         return Results.NotFound();
     }
 
-    // Fetch Seller details using the SellerId from the Product table
+    // ✅ Fetch Seller details using the SellerId from the Product table
     var orderDetails = new
     {
         order.Id,
         order.CustomerId,
         order.UserPaymentMethodId,
         order.IsComplete,
+        order.OrderDate, // ✅ Include OrderDate in response
         OrderItems = order.OrderItems.Select(oi => new
         {
             oi.ProductId,
@@ -272,7 +274,7 @@ app.MapGet("/api/orders/{id}", (BangazonDbContext db, string id) =>
                     s.Zip
                 })
                 .FirstOrDefault() // ✅ Get seller details for each product
-        }).ToList() // ✅ Make sure to convert to a list
+        }).ToList() // ✅ Convert to list
     };
 
     return Results.Ok(orderDetails);
@@ -401,25 +403,25 @@ app.MapGet("/api/users/userdetails/{uid}", (BangazonDbContext db, string uid) =>
 
 app.MapGet("/api/seller/dashboard/{sellerId}", (BangazonDbContext db, string sellerId) =>
 {
-    // Total Sales
+    // ✅ Total Sales
     decimal totalSales = db.OrderItems
         .Where(oi => oi.SellerId == sellerId && oi.Order.IsComplete)
         .Sum(oi => oi.Quantity * oi.Product.Price);
 
-    // Total Sales This Month
+    // ✅ Total Sales This Month (Replace `CreatedAt` with `OrderDate`)
     decimal totalSalesThisMonth = db.OrderItems
-        .Where(oi => oi.SellerId == sellerId && oi.Order.IsComplete && oi.Order.OrderDate.Month == DateTime.Now.Month)
-        .Sum(oi => oi.Quantity * oi.Product.Product);
+        .Where(oi => oi.SellerId == sellerId && oi.Order.IsComplete && oi.Order.OrderDate.Month == DateTime.UtcNow.Month)
+        .Sum(oi => oi.Quantity * oi.Product.Price);
 
-    // Average Sales per Item
+    // ✅ Average Sales per Item
     decimal averageSalesPerItem = db.OrderItems
         .Where(oi => oi.SellerId == sellerId && oi.Order.IsComplete)
         .GroupBy(oi => oi.ProductId)
-        .Select(g = global.Sum(oi => oi.Quantity * oi.Product.Price))
+        .Select(g => g.Sum(oi => oi.Quantity * oi.Product.Price))
         .DefaultIfEmpty(0)
         .Average();
 
-    // Total Inventory by Category
+    // ✅ Total Inventory by Category
     var inventoryByCategory = db.Products
         .Where(p => p.SellerId == sellerId)
         .GroupBy(p => p.Category.Title)
@@ -430,10 +432,10 @@ app.MapGet("/api/seller/dashboard/{sellerId}", (BangazonDbContext db, string sel
         })
         .ToList();
 
-    // Build and return the dashboard data
+    // ✅ Build and return the dashboard data
     var dashboardData = new
     {
-        TotalSales = totalSalesThisMonth,
+        TotalSales = totalSales,
         TotalSalesThisMonth = totalSalesThisMonth,
         AverageSalesPerItem = averageSalesPerItem,
         InventoryByCategory = inventoryByCategory
@@ -441,6 +443,7 @@ app.MapGet("/api/seller/dashboard/{sellerId}", (BangazonDbContext db, string sel
 
     return Results.Ok(dashboardData);
 });
+
 
 
 

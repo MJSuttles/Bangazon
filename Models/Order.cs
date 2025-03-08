@@ -15,6 +15,7 @@ public class Order
   public User User { get; set; }  // ✅ Correct reference to User
 
   public bool IsComplete { get; set; }
+  public DateTime OrderDate { get; set; }
   public int UserPaymentMethodId { get; set; }
 
   [ForeignKey("UserPaymentMethodId")]

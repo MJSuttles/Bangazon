@@ -49,8 +49,8 @@ public class BangazonDbContext : DbContext
     // ✅ Seed Data
     modelBuilder.Entity<User>().HasData(new User[]
     {
-        new User {Uid = "BCyBV6WJpTZcPG0b0WMfr8vJM1B3", FirstName = "Brian", LastName = "Suttles", Email = "rolltiderolldad@gmail.com", Address = "123 Elm Street", City = "Nashville", State = "TN", Zip = "37201"},
-        new User {Uid = "LoBA4EB98KfPtTZ7t8hE2xlbURw1", FirstName = "Dayna", LastName = "Suttles", Email = "suttles95@gmail.com", Address = "123 Elm Street", City = "Nashville", State = "TN", Zip = "37201"},
+        new User {Uid = "6Na5niFGCaUfZz7y9cjbFEq8twj1", FirstName = "Brian", LastName = "Suttles", Email = "rolltiderolldad@gmail.com", Address = "123 Elm Street", City = "Nashville", State = "TN", Zip = "37201"},
+        new User {Uid = "l4XlJweAr3USaFL4DW3h2PfIqAC3", FirstName = "Dayna", LastName = "Suttles", Email = "suttles95@gmail.com", Address = "123 Elm Street", City = "Nashville", State = "TN", Zip = "37201"},
         new User {Uid = "9a53d726-a2cd-42df-9d0f-5ae1a45c1c75", FirstName = "Alice", LastName = "Johnson", Email = "alicej@example.com", Address = "789 Pine Street", City = "Atlanta", State = "GA", Zip = "30301"},
         new User {Uid = "fa80e4a1-53b7-4784-ab59-6574dea65bb0", FirstName = "Bob", LastName = "Brown", Email = "bobb@example.com", Address = "321 Maple Avenue", City = "Charlotte", State = "NC", Zip = "28202"},
         new User {Uid = "2fe66f47-afdb-4a83-9dff-2d8e60b51b7a", FirstName = "Charlie", LastName = "Miller", Email = "charliem@example.com", Address = "654 Cedar Road", City = "Louisville", State = "KY", Zip = "40202"}
@@ -74,7 +74,7 @@ public class BangazonDbContext : DbContext
     modelBuilder.Entity<Product>().HasData(new Product[]
     {
       // Products for Brian Suttles
-      new Product {Id = 1, Name = "Rumours", IsAvailable = true, Price = 47.36M, Image = "https://m.media-amazon.com/images/I/71WxpWovLTL._SL1500_.jpg", Description = "Fleetwood Mac's best-selling album.", Quantity = 5, CategoryId = 1, SellerId = "BCyBV6WJpTZcPG0b0WMfr8vJM1B3"},
+      new Product {Id = 1, Name = "Rumours", IsAvailable = true, Price = 47.36M, Image = "https://m.media-amazon.com/images/I/71WxpWovLTL._SL1500_.jpg", Description = "Fleetwood Mac's best-selling album.", Quantity = 5, CategoryId = 1, SellerId = "6Na5niFGCaUfZz7y9cjbFEq8twj1"},
       new Product {Id = 2, Name = "Dark Side of the Moon", IsAvailable = true, Price = 51.99M, Image = "https://m.media-amazon.com/images/I/81j3Su+bWjL._SL1500_.jpg", Description = "Classic Pink Floyd album.", Quantity = 3, CategoryId = 1, SellerId = "BCyBV6WJpTZcPG0b0WMfr8vJM1B3"},
       new Product {Id = 3, Name = "Abbey Road", IsAvailable = true, Price = 38.50M, Image = "https://m.media-amazon.com/images/I/81Sl5vNuxBL._SL1500_.jpg", Description = "The Beatles' famous album.", Quantity = 7, CategoryId = 1, SellerId = "BCyBV6WJpTZcPG0b0WMfr8vJM1B3"},
       new Product {Id = 4, Name = "Jagged Little Pill", IsAvailable = true, Price = 15.99M, Image = "https://m.media-amazon.com/images/I/71+WumJptUL._SL1400_.jpg", Description = "Alanis Morissette's breakthrough album.", Quantity = 4, CategoryId = 2, SellerId = "BCyBV6WJpTZcPG0b0WMfr8vJM1B3"},
@@ -86,7 +86,7 @@ public class BangazonDbContext : DbContext
       new Product {Id = 10, Name = "Back in Black", IsAvailable = true, Price = 39.99M, Image = "https://m.media-amazon.com/images/I/61wq4+PxvFL._SL1400_.jpg", Description = "AC/DC's legendary album.", Quantity = 8, CategoryId = 2, SellerId = "BCyBV6WJpTZcPG0b0WMfr8vJM1B3"},
 
       // Products for Dayna Suttles
-      new Product {Id = 11, Name = "Lover", IsAvailable = true, Price = 39.99M, Image = "https://m.media-amazon.com/images/I/81zWwCEXKPL._SL1500_.jpg", Description = "Taylor Swift's 2019 album with pop anthems.", Quantity = 5, CategoryId = 1, SellerId = "LoBA4EB98KfPtTZ7t8hE2xlbURw1"},
+      new Product {Id = 11, Name = "Lover", IsAvailable = true, Price = 39.99M, Image = "https://m.media-amazon.com/images/I/81zWwCEXKPL._SL1500_.jpg", Description = "Taylor Swift's 2019 album with pop anthems.", Quantity = 5, CategoryId = 1, SellerId = "l4XlJweAr3USaFL4DW3h2PfIqAC3"},
       new Product {Id = 12, Name = "1989", IsAvailable = true, Price = 42.99M, Image = "https://m.media-amazon.com/images/I/71r44eosF8L._SL1500_.jpg", Description = "Taylor Swift's award-winning album from 2014.", Quantity = 6, CategoryId = 1, SellerId = "LoBA4EB98KfPtTZ7t8hE2xlbURw1"},
       new Product {Id = 13, Name = "Golden Hour", IsAvailable = true, Price = 35.99M, Image = "https://m.media-amazon.com/images/I/81g8mMUxsnL._SL1500_.jpg", Description = "Kacey Musgraves' Grammy-winning country album.", Quantity = 4, CategoryId = 1, SellerId = "LoBA4EB98KfPtTZ7t8hE2xlbURw1"},
       new Product {Id = 14, Name = "Fearless (Taylor's Version)", IsAvailable = true, Price = 36.50M, Image = "https://m.media-amazon.com/images/I/81bIVb9zTxL._SL1500_.jpg", Description = "Taylor Swift's re-recorded classic country-pop album.", Quantity = 7, CategoryId = 1, SellerId = "LoBA4EB98KfPtTZ7t8hE2xlbURw1"},
